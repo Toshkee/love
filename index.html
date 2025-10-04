@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Animation</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #ecb3ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Courier', monospace;
+  }
+  canvas { display: block; }
+  #textOverlay {
+    position: absolute;
+    color: rgb(13, 11, 12);
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+    font-size: 1.5rem;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="textOverlay"></div>
+<script>
+// ----- Setup Canvas -----
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ----- Heart Drawing -----
+function drawHeart(x, y, size, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.beginPath();
+  ctx.moveTo(0, -size / 2);
+  ctx.bezierCurveTo(size / 2, -size, size * 1.2, 0, 0, size);
+  ctx.bezierCurveTo(-size * 1.2, 0, -size / 2, -size, 0, -size / 2);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 20;
+  ctx.fill();
+  ctx.restore();
+}
+
+// ----- Rose Drawing (Simplified) -----
+function drawRose(x, y, scale) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = 'red';
+  ctx.shadowColor = 'red';
+  ctx.shadowBlur = 15;
+  for(let i=0;i<5;i++){
+    ctx.beginPath();
+    ctx.arc(Math.cos(i*Math.PI/2.5)*20*scale, Math.sin(i*Math.PI/2.5)*20*scale, 20*scale, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ----- Animated Text -----
+const messages = [
+  "My BUBICA",
+  "Te Amo",
+  "My Sweet Heart ❤️",
+  "I love you Baby ❤️",
+  "You are mine BABY",
+  "Your smile is my favorite thing in the world.",
+  "You are my sunshine on a cloudy day.",
+  "Every moment with you is a treasure.",
+  "You make my heart skip a beat.",
+  "I am so lucky to have you.",
+  "You complete me.",
+  "Volim te ruskice moja",
+];
+let textIndex = 0;
+const textOverlay = document.getElementById('textOverlay');
+
+function updateText() {
+  textOverlay.textContent = messages[textIndex];
+  textIndex = (textIndex + 1) % messages.length;
+}
+setInterval(updateText, 2500);
+updateText();
+
+// ----- Animation Loop -----
+let startTime = Date.now();
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const t = (Date.now()-startTime)/1000;
+  
+  // Background color pulse
+  const bg = 235 + 20*Math.sin(t*0.5);
+  document.body.style.backgroundColor = `rgb(${bg},179,255)`;
+
+  // Heart pulse
+  const heartSize = 100 + 20*Math.sin(t*2);
+  drawHeart(canvas.width/2, canvas.height/2, heartSize, 'red');
+
+  // Additional small hearts floating
+  for(let i=0;i<5;i++){
+    const angle = t + i*Math.PI/2.5;
+    drawHeart(canvas.width/2 + Math.cos(angle)*150, canvas.height/2 + Math.sin(angle)*120, 30, 'pink');
+  }
+
+  // Rose at bottom right
+  drawRose(canvas.width-150, canvas.height-150, 1.5);
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
